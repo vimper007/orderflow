@@ -15,10 +15,18 @@ export class Order {
   @Column()
   userId: string;
 
-  @Column({ type: 'jsonb' })
+  // postgres
+  // @Column({ type: 'jsonb' })
+
+  // sqljs
+  @Column({ type: 'simple-json' })
   items: OrderItem[];
 
-  @Column({ type: 'enum', enum: OrderStatus })
+  // postgres
+  // @Column({ type: 'enum', enum: OrderStatus })
+
+  // sqljs
+  @Column({ type: 'text', default: OrderStatus.Pending })
   status: OrderStatus;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
