@@ -6,9 +6,10 @@ export interface OrderItem {
 
 export enum OrderStatus {
   Pending = 'pending',
-  Reserved = 'reserved',
+  Confirmed = 'confirmed',
   Failed = 'failed',
   Cancelled = 'cancelled',
+  Completed = 'completed',
 }
 
 export interface Order {

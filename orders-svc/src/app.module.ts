@@ -7,6 +7,7 @@ import { Order } from './orders/entities/order.entity';
 import { OrdersModule } from './orders/orders.module';
 
 const isPostgres = process.env.DB_CLIENT === 'postgres'
+console.log("isPostgres",isPostgres,process.env.DB_CLIENT)
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -14,7 +15,7 @@ const isPostgres = process.env.DB_CLIENT === 'postgres'
     }),
 
     TypeOrmModule.forRoot(
-      isPostgres ?
+      !isPostgres ?
         {
           type: 'postgres',
           database: process.env.DB_NAME,
@@ -22,7 +23,8 @@ const isPostgres = process.env.DB_CLIENT === 'postgres'
           port: parseInt(process.env.DB_PORT || '3000'),
           password: process.env.DB_PASS ?? "",
           username: process.env.DB_USER,
-          entities: [Order]
+          entities: [Order],
+          synchronize: true
         }
         :
         {

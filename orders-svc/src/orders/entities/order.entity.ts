@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import { OrderItem, OrderStatus } from '../types/order.types';
 
-@Entity()
+@Entity("orders")
 export class Order {
   @PrimaryGeneratedColumn()
   id: number;
@@ -16,17 +16,17 @@ export class Order {
   userId: string;
 
   // postgres
-  // @Column({ type: 'jsonb' })
+  @Column({ type: 'jsonb' })
 
   // sqljs
-  @Column({ type: 'simple-json' })
+  // @Column({ type: 'simple-json' })
   items: OrderItem[];
 
   // postgres
-  // @Column({ type: 'enum', enum: OrderStatus })
+  @Column({ type: 'enum', enum: OrderStatus, default: OrderStatus.Pending })
 
   // sqljs
-  @Column({ type: 'text', default: OrderStatus.Pending })
+  // @Column({ type: 'text', default: OrderStatus.Pending })
   status: OrderStatus;
 
   @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
