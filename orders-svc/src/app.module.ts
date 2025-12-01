@@ -30,6 +30,7 @@ console.log("isPostgres",isPostgres,process.env.DB_CLIENT)
         {
           type: 'sqljs',
           entities: [Order],
+          // TODO Migratio
           synchronize: true,
         }
     ),
