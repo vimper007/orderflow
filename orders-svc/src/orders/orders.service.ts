@@ -1,9 +1,10 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderItem, OrderStatus } from './types/order.types';
+import { FindOrdersDto } from './dto/find-orders.dto';
 
 @Injectable()
 export class OrdersService {
@@ -12,8 +13,28 @@ export class OrdersService {
     private readonly ordersRepository: Repository<Order>,
   ) { }
 
-  findAll() {
-    return this.ordersRepository.find();
+  // findAll() {
+  //   return this.ordersRepository.find();
+  // }
+
+  async findAndCountBy(@Query() dto: FindOrdersDto) {
+    const { limit = 10, offset = 0, status, userId } = dto
+    const where: any = {}
+    if (status) where.status = status
+    if (userId) where.userId = userId
+
+    const [orders, total] = await this.ordersRepository.findAndCount({
+      where,
+      take: limit,
+      skip: offset * limit
+    })
+
+    return {
+      data: orders,
+      count: total,
+      page: offset + 1,
+      items: limit
+    }
   }
 
   findOne(id: number) {
@@ -54,11 +75,11 @@ export class OrdersService {
     return this.ordersRepository.delete(id)
   }
 
-  findByStatusOrUserId(status?: OrderStatus, userId?: string) {
-    const where: any = {}
-    if (status) where.status = status
-    if (userId) where.userId = userId
-    return this.ordersRepository.findBy(where)
-  }
+  // findByStatusOrUserId(status?: OrderStatus, userId?: string) {
+  //   const where: any = {}
+  //   if (status) where.status = status
+  //   if (userId) where.userId = userId
+  //   return this.ordersRepository.findBy(where)
+  // }
 }
 // so the behaviour should be if either 1 param is there filter only by it, if both params are there filter by both, if any params is invalid throw an error with the wrong param, if no params return all orders

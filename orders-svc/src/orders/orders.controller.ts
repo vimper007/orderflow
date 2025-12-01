@@ -13,17 +13,22 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { OrderStatus } from './types/order.types';
-import { FindByStatusOrUserIdDto } from './dto/find-by-status-userId.dto';
+import { FindOrdersDto } from './dto/find-orders.dto';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) { }
 
   @Get()
-  findByStatusOrUserId(@Query() { status, userId }: FindByStatusOrUserIdDto) {
-    if(!status && !userId) return this.ordersService.findAll()
-    return this.ordersService.findByStatusOrUserId(status, userId)
+  findAndCountBy(@Query() query: FindOrdersDto) {
+    // if(!status && !userId) return this.ordersService.findAll()
+    return this.ordersService.findAndCountBy(query)
   }
+
+  // @Get()
+  // findAll(){
+  //   return this.ordersService.findall()
+  // }
 
   @Get('/:id')
   findOne(@Param('id', ParseIntPipe) id: number) {
