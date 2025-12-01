@@ -22,7 +22,7 @@ export class OrdersController {
   @Get()
   findAndCountBy(@Query() query: FindOrdersDto) {
     // if(!status && !userId) return this.ordersService.findAll()
-    return this.ordersService.findAndCountBy(query)
+    return this.ordersService.findAll(query)
   }
 
   // @Get()

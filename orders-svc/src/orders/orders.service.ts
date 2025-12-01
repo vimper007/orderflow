@@ -17,7 +17,7 @@ export class OrdersService {
   //   return this.ordersRepository.find();
   // }
 
-  async findAndCountBy(@Query() dto: FindOrdersDto) {
+  async findAll(@Query() dto: FindOrdersDto) {
     const { limit = 10, offset = 0, status, userId } = dto
     const where: any = {}
     if (status) where.status = status
