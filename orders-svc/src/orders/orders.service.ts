@@ -27,7 +27,7 @@ export class OrdersService {
     const [orders, total] = await this.ordersRepository.findAndCount({
       where,
       take: limit,
-      skip: (page * limit),
+      skip: ((page - 1) * limit),
       order,
     })
     const lastPage = Math.ceil(total / limit)
