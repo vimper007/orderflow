@@ -20,10 +20,10 @@ export class OrdersService {
   async findAll(@Query() dto: FindOrdersDto) {
     const { limit = 10, page = 1, status, userId, sortBy = 'createdAt', sortDir = 'DESC' } = dto
     const where: any = {}
-    const order:any = {}
+    const order: any = {}
     if (status) where.status = status
     if (userId) where.userId = userId
-    if(sortBy) order.createdAt = sortDir
+    if (sortBy) order[sortBy] = sortDir
     const [orders, total] = await this.ordersRepository.findAndCount({
       where,
       take: limit,
