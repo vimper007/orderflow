@@ -1,4 +1,4 @@
-import { IsEmpty, IsEnum, IsInt, IsOptional, IsString, Min } from "class-validator";
+import { IsEmpty, IsEnum, IsIn, IsInt, IsOptional, IsString, Min } from "class-validator";
 import { OrderStatus } from "../types/order.types";
 
 export class FindOrdersDto {
@@ -14,11 +14,19 @@ export class FindOrdersDto {
     // Pagination to limit data
     @IsOptional()
     @IsInt()
-    @Min(0)
-    offset?: number = 0;
+    @Min(1)
+    page?: number = 1;
 
     @IsOptional()
     @IsInt()
     @Min(1)
     limit?: number = 10;
+
+    @IsOptional()
+    @IsIn(['createdAt'])
+    sortBy?: 'createdAt' = 'createdAt'
+
+    @IsOptional()
+    @IsIn(['ASC', 'DESC'])
+    sortDir?: 'ASC' | 'DESC' = 'DESC'
 }

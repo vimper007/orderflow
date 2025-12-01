@@ -18,26 +18,31 @@ export class OrdersService {
   // }
 
   async findAll(@Query() dto: FindOrdersDto) {
-    const { limit = 10, offset = 0, status, userId } = dto
+    const { limit = 10, page = 1, status, userId, sortBy = 'createdAt', sortDir = 'DESC' } = dto
     const where: any = {}
+    const order:any = {}
     if (status) where.status = status
     if (userId) where.userId = userId
-
+    if(sortBy) order.createdAt = sortDir
     const [orders, total] = await this.ordersRepository.findAndCount({
       where,
       take: limit,
-      skip: offset * limit
+      skip: (page * limit),
+      order,
     })
-
+    const lastPage = Math.ceil(total / limit)
     return {
       data: orders,
       count: total,
-      page: offset + 1,
-      items: limit
+      page,
+      items: limit,
+      lastPage 
     }
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
+    const order = await this.ordersRepository.findOneBy({ id })
+    if(!order) throw new NotFoundException("Order not found!, Invalid Order Id")
     return this.ordersRepository.findOneBy({ id });
   }
 

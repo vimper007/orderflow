@@ -31,7 +31,7 @@ export class OrdersController {
   // }
 
   @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: number) {
     return this.ordersService.findOne(id);
   }
 
