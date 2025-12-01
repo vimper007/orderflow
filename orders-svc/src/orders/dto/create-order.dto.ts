@@ -1,5 +1,15 @@
-import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsString, Min } from "class-validator";
-import { OrderItem, OrderStatus } from "../types/order.types";
+import { Type } from "class-transformer";
+import { IsArray, IsInt, IsNotEmpty, IsNumber, IsString, Min, ValidateNested, ArrayMinSize } from "class-validator";
+
+export class OrderItemDto {
+    @IsString()
+    @IsNotEmpty()
+    productId: string;
+
+    @IsInt()
+    @Min(1)
+    quantity: number;
+}
 
 export class CreateOrderDto {
     
@@ -8,10 +18,10 @@ export class CreateOrderDto {
     userId: string;
 
     @IsArray()
-    items: OrderItem[];
-
-    // @IsEnum(OrderStatus)
-    // status:OrderStatus
+    @ValidateNested({ each: true })
+    @Type(() => OrderItemDto)
+    @ArrayMinSize(1)
+    items: OrderItemDto[];
 
     @IsNumber()
     @Min(0)
