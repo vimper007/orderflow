@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './orders/entities/order.entity';
 import { OrdersModule } from './orders/orders.module';
 import { ClientsModule, Transport } from '@nestjs/microservices';
+import { KafkaModule } from './kafka/kafka.module';
 
 const isPostgres = process.env.DB_CLIENT === 'postgres'
 @Module({
@@ -58,6 +59,7 @@ const isPostgres = process.env.DB_CLIENT === 'postgres'
     ]),
 
     OrdersModule,
+    KafkaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

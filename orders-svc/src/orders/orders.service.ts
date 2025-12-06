@@ -6,13 +6,15 @@ import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderItem, OrderStatus } from './types/order.types';
 import { FindOrdersDto } from './dto/find-orders.dto';
 import { ClientKafka } from '@nestjs/microservices';
+import { KafkaProducerService } from 'src/kafka/kafka-producer/kafka-producer.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly ordersRepository: Repository<Order>,
-    @Inject("KAFKA_ORDERS_SERVICE") private readonly kafkaClient: ClientKafka
+    // @Inject("KAFKA_ORDERS_SERVICE") private readonly kafkaClient: ClientKafka,
+    private readonly kafkaProducerService: KafkaProducerService
   ) { }
 
   // findAll() {
@@ -39,13 +41,13 @@ export class OrdersService {
       count: total,
       page,
       items: limit,
-      lastPage 
+      lastPage
     }
   }
 
   async findOne(id: number) {
     const order = await this.ordersRepository.findOneBy({ id })
-    if(!order) throw new NotFoundException("Order not found!, Invalid Order Id")
+    if (!order) throw new NotFoundException("Order not found!, Invalid Order Id")
     return this.ordersRepository.findOneBy({ id });
   }
 
@@ -74,7 +76,8 @@ export class OrdersService {
   }
 
   async create(createOrderDto: CreateOrderDto) {
-    await this.checkKafkaClient(createOrderDto)
+    const topic = 'order.created'
+    this.kafkaProducerService.sendMessage(topic, JSON.stringify(createOrderDto))
     return this.ordersRepository.save(createOrderDto);
   }
 
@@ -91,14 +94,14 @@ export class OrdersService {
   //   return this.ordersRepository.findBy(where)
   // }
 
-  checkKafkaClient(payload:CreateOrderDto){
-    const topic = 'order.created'
-    const eventPayload = payload
+  // checkKafkaClient(payload:CreateOrderDto){
+  //   const topic = 'order.created'
+  //   const eventPayload = payload
 
-    try {
-       this.kafkaClient.emit(topic,JSON.stringify(eventPayload))
-    } catch (error) {
-       throw new ConflictException("Cannot perform publish order created action")
-    }
-  }
+  //   try {
+  //      this.kafkaClient.emit(topic,JSON.stringify(eventPayload))
+  //   } catch (error) {
+  //      throw new ConflictException("Cannot perform publish order created action")
+  //   }
+  // }
 }
