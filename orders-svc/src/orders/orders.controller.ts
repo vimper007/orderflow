@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -32,6 +33,7 @@ export class OrdersController {
 
   @Get('/:id')
   findOne(@Param('id') id: number) {
+    if(isNaN(id)) throw new BadRequestException("Invalid id, Id must be a number")
     return this.ordersService.findOne(id);
   }
 

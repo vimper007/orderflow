@@ -10,6 +10,7 @@ export enum OrderStatus {
   Failed = 'failed',
   Cancelled = 'cancelled',
   Completed = 'completed',
+  Reserved = 'reserved'
 }
 
 export interface Order {

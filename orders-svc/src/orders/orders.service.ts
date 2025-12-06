@@ -1,22 +1,25 @@
-import { BadRequestException, Injectable, NotFoundException, Query } from '@nestjs/common';
+import { BadRequestException, ConflictException, Inject, Injectable, NotFoundException, Query } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderItem, OrderStatus } from './types/order.types';
 import { FindOrdersDto } from './dto/find-orders.dto';
+import { ClientKafka } from '@nestjs/microservices';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly ordersRepository: Repository<Order>,
+    @Inject("KAFKA_ORDERS_SERVICE") private readonly kafkaClient: ClientKafka
   ) { }
 
   // findAll() {
   //   return this.ordersRepository.find();
   // }
 
+  // so the behaviour should be if either 1 param is there filter only by it, if both params are there filter by both, if any params is invalid throw an error with the wrong param, if no params return all orders
   async findAll(@Query() dto: FindOrdersDto) {
     const { limit = 10, page = 1, status, userId, sortBy = 'createdAt', sortDir = 'DESC' } = dto
     const where: any = {}
@@ -70,7 +73,8 @@ export class OrdersService {
 
   }
 
-  create(createOrderDto: CreateOrderDto) {
+  async create(createOrderDto: CreateOrderDto) {
+    await this.checkKafkaClient(createOrderDto)
     return this.ordersRepository.save(createOrderDto);
   }
 
@@ -86,5 +90,15 @@ export class OrdersService {
   //   if (userId) where.userId = userId
   //   return this.ordersRepository.findBy(where)
   // }
+
+  checkKafkaClient(payload:CreateOrderDto){
+    const topic = 'order.created'
+    const eventPayload = payload
+
+    try {
+       this.kafkaClient.emit(topic,JSON.stringify(eventPayload))
+    } catch (error) {
+       throw new ConflictException("Cannot perform publish order created action")
+    }
+  }
 }
-// so the behaviour should be if either 1 param is there filter only by it, if both params are there filter by both, if any params is invalid throw an error with the wrong param, if no params return all orders

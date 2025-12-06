@@ -5,9 +5,9 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Order } from './orders/entities/order.entity';
 import { OrdersModule } from './orders/orders.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 const isPostgres = process.env.DB_CLIENT === 'postgres'
-console.log("isPostgres",isPostgres,process.env.DB_CLIENT)
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -34,6 +34,28 @@ console.log("isPostgres",isPostgres,process.env.DB_CLIENT)
           synchronize: true,
         }
     ),
+
+    ClientsModule.register([
+      {
+        name: 'KAFKA_ORDERS_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            clientId: 'KAFKA_CLIENT',
+            brokers: ['localhost:9092'],
+          },
+          // https://www.telerik.com/blogs/how-to-integrate-kafka-nestjs-event-driven-microservices
+          producer: {
+            allowAutoTopicCreation: true, // Convenient for development
+            idempotent: true, // Prevents the same message from being saved multiple times
+            retry: {
+              retries: 5,
+              maxRetryTime: 30000,
+            },
+          },
+        }
+      },
+    ]),
 
     OrdersModule,
   ],
