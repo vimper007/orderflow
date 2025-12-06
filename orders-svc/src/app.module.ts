@@ -58,8 +58,6 @@ const isPostgres = process.env.DB_CLIENT === 'postgres'
       },
     ]),
 
-    OrdersModule,
-    KafkaModule,
   ],
   controllers: [AppController],
   providers: [AppService],
